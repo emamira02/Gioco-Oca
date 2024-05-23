@@ -1,9 +1,10 @@
 import redis
 from builtins import print
+from startdb import start
 
 # Configurazione di Redis
 # Creiamo un'istanza del client Redis collegandolo al server Redis locale sulla porta predefinita 6379 e utilizzando il database 0
-redis_client = redis.StrictRedis(host='localhost', port=6379, db=0, decode_responses=True)
+redis_client = start()
 
 # Funzione di registrazione
 def registrazione(nome_utente, password):
