@@ -1,56 +1,105 @@
-from flask import Flask, request, jsonify
-from flask_socketio import SocketIO, join_room, leave_room, send
-from flask_bcrypt import Bcrypt
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 import redis
-import json
-import uuid
-
+from builtins import print
 
 # Configurazione di Redis
+# Creiamo un'istanza del client Redis collegandolo al server Redis locale sulla porta predefinita 6379 e utilizzando il database 0
 redis_client = redis.StrictRedis(host='localhost', port=6379, db=0, decode_responses=True)
 
+# Funzione di registrazione
+def registrazione(nome_utente, password):
+    # Controlla se l'utente esiste già
+    if redis_client.hexists('users', nome_utente):
+        print("User already exists")
+        return
+# Crea una chiave utente con il formato 'user:username'
+    user_key = f'user:{nome_utente}'
+# Memorizza la password e lo stato di 'voted' (votato) come campi hash per l'utente
+    redis_client.hset(user_key, 'password', password)
+    redis_client.hset(user_key, 'voted', 'False')
+    print("Utente registrato")
 
-def registrazione():
-    data = request.get_json()
-    nome_utente = data['nome_utente']
-    password = data['password']
-    
-    if redis_client.hexists('user', nome_utente):
-        return jsonify({"message": "User already exists"}), 400
-    user_data = {
-        'password': password,
-        'voted': False
-    }
-    redis_client.hset('users', nome_utente, json.dumps(user_data))
-    return jsonify({"message": "User registered successfully"}), 201
+# Funzione di login
+def login(username, password):
+# Crea una chiave utente con il formato 'user:username'
+    user_key = f'user:{username}'
+# Controlla se la chiave utente esiste nel database
+    if not redis_client.exists(user_key):
+        print("Invalid credentials")
+        return
+# Recupera la password memorizzata per l'utente
+    stored_password = redis_client.hget(user_key, 'password')
+# Verifica se la password fornita corrisponde a quella memorizzata
+    if stored_password != password:
+        print("Invalid credentials")
+        return
 
-def login():
-    data = request.get_json()
-    username = data['username']
-    password = data['password']
-
-    if not redis_client.hexists('users', username):
-        return jsonify({"message": "Invalid credentials"}), 401
-    #Recupera i dati dell'utente memorizzati in Redis sotto la chiave username
-    #json.load: Converte la stringa JSON recuperata da Redis in un dizionario Python
-    user_data = json.loads(redis_client.hget('users', username))
-    #verifica della password
-    if user_data['password'] != password:
-        return jsonify({"message": "Invalid credentials"}), 401
-    #Confronto la password fornita dall'utente (password) con la password memorizzata nel dizionario user_data
-    #Se non coincidono restituisce una risposta JSON con un messaggio di errore e lo stato HTTP 401 (Unauthorized)
-    
-    # Salvare lo stato di login nel Redis
+# Imposta lo stato di login per l'utente memorizzando una chiave di sessione
     redis_client.set(f'user_session:{username}', 'logged_in')
-    return jsonify({"message": "Login successful"}), 200
+    print("Login successful")
 
-    #disconnessione dell'utente dal sistema 
-def logout():
-    username = request.json.get('username')
+# Funzione di logout
+def logout(username):
+# Elimina la chiave di sessione dell'utente per effettuare il logout
     redis_client.delete(f'user_session:{username}')
-    #elimina la chiave nomeutente da redis che viene utilizzata per memorizzare lo stato di login dell'utente
-    return jsonify({"message": "Logout successful"}), 200
+    print("Logout successful")
+
+# Funzione per inviare un messaggio
+def send_message(username, message):
+# Controlla se l'utente è loggato verificando l'esistenza della chiave di sessione
+    if not redis_client.exists(f'user_session:{username}'):
+        print("User not logged in")
+        return
+# Incrementa l'ID del messaggio per ottenere un nuovo ID unico
+    message_id = redis_client.incr('message_id')
+# Crea una chiave di messaggio con il formato 'message:message_id'
+    message_key = f'message:{message_id}'
+# Memorizza il nome utente e il messaggio come campi hash per il messaggio
+    redis_client.hset(message_key, 'username', username)
+    redis_client.hset(message_key, 'message', message)
+    print("Message sent successfully")
+
+# Funzione per recuperare i messaggi
+def get_messages():
+    message_keys = redis_client.keys('message:*')
+    for key in message_keys:
+        message_data = redis_client.hgetall(key)
+        print(f"ID: {key.split(':')[-1]}, User: {message_data['username']}, Message: {message_data['message']}")
+
+# Funzione principale per l'interfaccia a riga di comando
+def main():
+    while True:
+        print("1. Register")
+        print("2. Login")
+        print("3. Logout")
+        print("4. Send Message")
+        print("5. Get Messages")
+        print("6. Exit")
+        choice = input("Enter your choice: ")
+
+        if choice == '1':
+            nome_utente = input("Enter username: ")
+            password = input("Enter password: ")
+            registrazione(nome_utente, password)
+        elif choice == '2':
+            username = input("Enter username: ")
+            password = input("Enter password: ")
+            login(username, password)
+        elif choice == '3':
+            username = input("Enter username: ")
+            logout(username)
+        elif choice == '4':
+            username = input("Enter username: ")
+            message = input("Enter message: ")
+            send_message(username, message)
+        elif choice == '5':
+            get_messages()
+        elif choice == '6':
+            break
+        else:
+            print("Invalid choice. Please try again.")
+
+if __name__ == '__main__':
+    main()
 
 
 
