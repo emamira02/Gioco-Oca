@@ -2,8 +2,8 @@ import redis as r
 import time 
 from startdb import start
 
-redis_client = start()
-print(redis_client.ping())
+r = start()
+print(r.ping())
 
 
 def invio_messaggio(sender_hash, recipient_hash, messaggio):
