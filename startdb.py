@@ -6,13 +6,7 @@ def start():
     r = redis.Redis(
         host='redis-13587.c250.eu-central-1-1.ec2.redns.redis-cloud.com',
         port=13587,
-        username="admin",
-        password="Password123.",
+        username="default",
+        password="UvDrJ3N7kZnlrQ1ScJ2rAl25kAdAtbvt",
         decode_responses=True)
     return r
-
-if __name__ == "__main__":
-    db = start()
-    db.set("utente:francesco", "password")
-    password = db.get("utente:francesco")
-    print(password)
