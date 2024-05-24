@@ -38,7 +38,7 @@ def login(username, password):
 # Imposta lo stato di login per l'utente memorizzando una chiave di sessione
     r.set(f'user_session:{username}', 'logged_in')
     print("Login successful")
-
+    
 # Funzione di logout
 def logout(username):
 # Elimina la chiave di sessione dell'utente per effettuare il logout
@@ -79,28 +79,12 @@ def ricezione_messaggio(user_hash):
                 sender_hash, recipient_hash = recipient_hash, sender_hash
             stampa_notifica(sender_hash, recipient_hash, message['data'].decode('utf-8'))
 
-# Dizionario delle azioni per il menu principale
-azioni_principali = {
-    '1': 'Registrati',
-    '2': 'Accedi',
-    '3': 'Esci'
-}
-
-# Dizionario delle azioni per il menu dopo il login
-azioni_secondarie = {
-    '1': 'Logout',
-    '2': 'Invia Messaggio',
-    '3': 'Visualizza Messaggi'
-}
-
-def stampa_azioni(azioni):
-    for key, value in azioni.items():
-        print(f"{key}. {value}")
-
 def main():
     while True:
         print("Benvenuto! Cosa vuoi fare?")
-        stampa_azioni(azioni_principali)
+        print("1. Registrati")
+        print("2. Accedi")
+        print("3. Esci")
 
         scelta = input("Inserisci il numero della tua scelta: ")
 
@@ -111,30 +95,13 @@ def main():
         elif scelta == "2":
             username = input("Inserisci il tuo username: ")
             password = input("Inserisci la tua password: ")
-            if login(username, password):
-                while True:
-                    print("\nAzioni disponibili:")
-                    stampa_azioni(azioni_secondarie)
-                    sub_scelta = input("Inserisci il numero della tua scelta: ")
-
-                    if sub_scelta == "1":
-                        logout(username)
-                        break
-                    elif sub_scelta == "2":
-                        message = input("Inserisci il messaggio: ")
-                        send_message(username, message)
-                    elif sub_scelta == "3":
-                        get_messages()
-                    else:
-                        print("Scelta non valida, riprova.")
+            login(username, password)
         elif scelta == "3":
             print("Arrivederci!")
             break
         else:
             print("Scelta non valida, riprova.")
 
-if __name__ == '__main__':
-    main()
 
 
     
