@@ -99,6 +99,10 @@ def send_message(username):
 
 # Funzione per recuperare i messaggi
 def get_messages(username):
+    
+    rubrica_key = f'rubrica:{username}'
+    contatti = r.smembers(rubrica_key)
+    contatto = simpledialog.askstring("Invia Messaggio", f"Scegli il contatto:\n{list(contatti)}", parent=root)
     message_keys = r.keys('message:*')
     if not message_keys:
         messagebox.showinfo("Messaggi", "Nessun messaggio trovato")
@@ -125,6 +129,9 @@ def ricezione_messaggio(user_hash):
             if sender_hash == user_hash:
                 sender_hash, recipient_hash = recipient_hash, sender_hash
             stampa_notifica(sender_hash, recipient_hash, message['data'].decode('utf-8'))
+
+
+            
 
 def main():
     root = tk.Tk()
