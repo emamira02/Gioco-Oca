@@ -129,7 +129,7 @@ def ricezione_messaggio(user_hash):
 def main():
     root = tk.Tk()
     root.withdraw()
-    root.geometry("300x300")
+    root.geometry("500x500")
     while True:
         scelta = simpledialog.askstring("Benvenuto!", "Cosa vuoi fare?\n1. Registrati\n2. Accedi\n3. Esci", parent=root)
 
