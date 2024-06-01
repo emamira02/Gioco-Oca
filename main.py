@@ -104,7 +104,11 @@ def get_messages(username):
     root.withdraw()
     rubrica_key = f'rubrica:{username}'
     contatti = r.smembers(rubrica_key)
-    contatto = simpledialog.askstring("Invia Messaggio", f"Scegli il contatto:\n{list(contatti)}", parent=root)
+    contatto = simpledialog.askstring("Visualizza Messaggi", f"Scegli il contatto:\n{list(contatti)}", parent=root)
+    if contatto not in contatti:
+        messagebox.showinfo("Errore", "Contatto non trovato nella rubrica.")
+        return
+    
     message_keys = r.keys('message:*')
     if not message_keys:
         messagebox.showinfo("Messaggi", "Nessun messaggio trovato")
@@ -113,12 +117,17 @@ def get_messages(username):
     messaggi = []
     for key in message_keys:
         message_data = r.hgetall(key)
-        recipient = message_data.get('recipient', 'Sconosciuto')
-        timestamp = message_data.get('timestamp', 'Data non disponibile')
-        messaggi.append(f"ID: {key.split(':')[-1]}, User: {message_data['username']}, Message: {message_data['message']}, Recipient: {recipient}, Timestamp: {timestamp}")
+        sender = message_data.get('username')
+        recipient = message_data.get('recipient')
+        if (sender == username and recipient == contatto) or (sender == contatto and recipient == username):
+            timestamp = message_data.get('timestamp', 'Data non disponibile')
+            messaggi.append(f"ID: {key.split(':')[-1]}, User: {sender}, Message: {message_data['message']}, Recipient: {recipient}, Timestamp: {timestamp}")
     
-    messaggi_str = "\n\n".join(messaggi)
-    messagebox.showinfo("Messaggi", messaggi_str)
+    if messaggi:
+        messaggi_str = "\n\n".join(messaggi)
+        messagebox.showinfo("Messaggi", messaggi_str)
+    else:
+        messagebox.showinfo("Messaggi", "Nessun messaggio trovato")
 
 def ricezione_messaggio(user_hash):
     # Codice per la ricezione dei messaggi in tempo reale 
