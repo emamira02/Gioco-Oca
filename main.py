@@ -15,8 +15,10 @@ def registrazione(nome_utente, password):
     user_key = f'user:{nome_utente}'
     r.hset(user_key, 'password', password)
     r.hset(user_key, 'voted', 'False')
+    r.hset('users', nome_utente, 1) 
     messagebox.showinfo("Successo", "Utente registrato")
     return True
+
 
 # Funzione di login
 def login(username, password):
