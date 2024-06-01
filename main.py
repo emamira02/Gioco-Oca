@@ -141,7 +141,12 @@ def main():
         scelta = simpledialog.askstring("Benvenuto!", "Cosa vuoi fare?\n1. Registrati\n2. Accedi\n3. Esci", parent=root)
 
         if scelta == "1":
-            nome_utente = simpledialog.askstring("Registrati", "Inserisci il tuo username:", parent=root)
+            while True:
+                nome_utente = simpledialog.askstring("Registrati", "Inserisci il tuo username:", parent=root)
+                if r.hexists('users', nome_utente):
+                    messagebox.showinfo("Errore", "Nome utente già utilizzato, inseriscine un altro.")
+                else:
+                    break
             password = simpledialog.askstring("Registrati", "Inserisci la tua password:", parent=root)
             if nome_utente and password:
                 registrazione(nome_utente, password)
