@@ -15,10 +15,9 @@ def registrazione(nome_utente, password):
     user_key = f'user:{nome_utente}'
     r.hset(user_key, 'password', password)
     r.hset(user_key, 'voted', 'False')
-    r.hset('users', nome_utente, 1) 
+    r.hset('users', nome_utente, 1)
     messagebox.showinfo("Successo", "Utente registrato")
     return True
-
 
 # Funzione di login
 def login(username, password):
@@ -80,7 +79,7 @@ def send_message(username):
     rubrica_key = f'rubrica:{username}'
     contatti = r.smembers(rubrica_key)
     if not contatti:
-        messagebox.showinfo("Errore", "/Rubrica vuota. Aggiungi un contatto prima di inviare un messaggio.")
+        messagebox.showinfo("Errore", "Rubrica vuota. Aggiungi un contatto prima di inviare un messaggio.")
         return
     
     root = tk.Tk()
@@ -133,49 +132,59 @@ def ricezione_messaggio(user_hash):
                 sender_hash, recipient_hash = recipient_hash, sender_hash
             stampa_notifica(sender_hash, recipient_hash, message['data'].decode('utf-8'))
 
-
-            
+# Funzione per gestire la chiusura della finestra principale
+def on_closing():
+    root.quit()
+    root.destroy()
 
 def main():
+    global root
     root = tk.Tk()
     root.withdraw()
     root.geometry("500x500")
+    root.protocol("WM_DELETE_WINDOW", on_closing)
+    
     while True:
-        scelta = simpledialog.askstring("Benvenuto!", "Cosa vuoi fare?\n1. Registrati\n2. Accedi\n3. Esci", parent=root)
-
-        if scelta == "1":
-            while True:
-                nome_utente = simpledialog.askstring("Registrati", "Inserisci il tuo username:", parent=root)
-                if r.hexists('users', nome_utente):
-                    messagebox.showinfo("Errore", "Nome utente già utilizzato, inseriscine un altro.")
-                else:
-                    break
-            password = simpledialog.askstring("Registrati", "Inserisci la tua password:", parent=root)
-            if nome_utente and password:
-                registrazione(nome_utente, password)
-        elif scelta == "2":
-            username = simpledialog.askstring("Accedi", "Inserisci il tuo username:", parent=root)
-            password = simpledialog.askstring("Accedi", "Inserisci la tua password:", parent=root)
-            if username and password and login(username, password):
+        try:
+            scelta = simpledialog.askstring("Benvenuto!", "Cosa vuoi fare?\n1. Registrati\n2. Accedi\n3. Esci", parent=root)
+            if scelta is None:
+                break
+            if scelta == "1":
                 while True:
-                    sub_scelta = simpledialog.askstring("Azioni disponibili", "1. Logout\n2. Invia Messaggio\n3. Visualizza Messaggi\n4. Gestisci Rubrica", parent=root)
-                    
-                    if sub_scelta == "1":
-                        logout(username)
-                        break
-                    elif sub_scelta == "2":
-                        send_message(username)
-                    elif sub_scelta == "3":
-                        get_messages(username)
-                    elif sub_scelta == "4":
-                        gestisci_rubrica(username)
+                    nome_utente = simpledialog.askstring("Registrati", "Inserisci il tuo username:", parent=root)
+                    if r.hexists('users', nome_utente):
+                        messagebox.showinfo("Errore", "Nome utente già utilizzato, inseriscine un altro.")
                     else:
-                        messagebox.showinfo("Errore", "Scelta non valida, riprova.")
-        elif scelta == "3":
-            messagebox.showinfo("Arrivederci!", "Arrivederci!")
+                        break
+                password = simpledialog.askstring("Registrati", "Inserisci la tua password:", parent=root)
+                if nome_utente and password:
+                    registrazione(nome_utente, password)
+            elif scelta == "2":
+                username = simpledialog.askstring("Accedi", "Inserisci il tuo username:", parent=root)
+                password = simpledialog.askstring("Accedi", "Inserisci la tua password:", parent=root)
+                if username and password and login(username, password):
+                    while True:
+                        sub_scelta = simpledialog.askstring("Azioni disponibili", "1. Logout\n2. Invia Messaggio\n3. Visualizza Messaggi\n4. Gestisci Rubrica", parent=root)
+                        if sub_scelta is None:
+                            break
+                        if sub_scelta == "1":
+                            logout(username)
+                            break
+                        elif sub_scelta == "2":
+                            send_message(username)
+                        elif sub_scelta == "3":
+                            get_messages(username)
+                        elif sub_scelta == "4":
+                            gestisci_rubrica(username)
+                        else:
+                            messagebox.showinfo("Errore", "Scelta non valida, riprova.")
+            elif scelta == "3":
+                messagebox.showinfo("Arrivederci!", "Arrivederci!")
+                break
+            else:
+                messagebox.showinfo("Errore", "Scelta non valida, riprova.")
+        except tk.TclError:
             break
-        else:
-            messagebox.showinfo("Errore", "Scelta non valida, riprova.")
 
 if __name__ == '__main__':
     main()
