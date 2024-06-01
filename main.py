@@ -99,7 +99,8 @@ def send_message(username):
 
 # Funzione per recuperare i messaggi
 def get_messages(username):
-    
+    root = tk.Tk()
+    root.withdraw()
     rubrica_key = f'rubrica:{username}'
     contatti = r.smembers(rubrica_key)
     contatto = simpledialog.askstring("Invia Messaggio", f"Scegli il contatto:\n{list(contatti)}", parent=root)
