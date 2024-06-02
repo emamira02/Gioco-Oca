@@ -63,10 +63,22 @@ def gestisci_rubrica(username):
                                         parent=root)
 
         if scelta == "1":
-            contatto = simpledialog.askstring("Aggiungi contatto", "Inserisci il nome del contatto da aggiungere:", parent=root)
-            if contatto:
-                aggiungi_contatto(username, contatto)
-                messagebox.showinfo("Successo", "Contatto aggiunto con successo.")
+
+            cerca_contatti = simpledialog.askstring("Cerca contatto", "Inserisci il nome (o una parte) del contatto da aggiungere:", parent=root)
+            cursore, contatti = r.scan(0, match=f'user:{cerca_contatti}*')
+            if contatti:
+                contatti_dict = {str(n):nome[5:] for n, nome in enumerate(contatti, start=1)}
+                print(contatti_dict)
+                scelta = simpledialog.askstring("Aggiunta contatto", f"Scrivi il numero del contatto che vuoi aggiungere\n{contatti_dict}", parent=root)
+                try:
+                    contatto = contatti_dict[scelta]
+                    aggiungi_contatto(username, contatto)
+                    messagebox.showinfo("Successo", "Contatto aggiunto con successo.")
+                except KeyError:
+                    messagebox.showinfo("Errore", "Scelta non valida, riprova.")
+            else:
+                messagebox.showinfo("Nessun contatto", "La ricerca non ha restituito alcun contatto")
+
         elif scelta == "2":
             visualizza_rubrica(username)
         elif scelta == "3":
