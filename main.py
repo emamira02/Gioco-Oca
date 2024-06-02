@@ -106,6 +106,26 @@ def gestisci_rubrica(username):
         else:
             messagebox.showinfo("Errore", "Scelta non valida, riprova.")
 
+# Funzione per avviare una chat a tempo con un contatto
+def avvia_chat_tempo(username):
+    root = tk.Tk()
+    root.withdraw()
+    rubrica_key = f'rubrica:{username}'
+    contatti = r.smembers(rubrica_key)
+    if not contatti:
+        messagebox.showinfo("Errore", "Rubrica vuota. Aggiungi un contatto prima di avviare una chat a tempo.")
+        return
+
+    contatto = simpledialog.askstring("Avvia Chat a Tempo", f"Scegli il contatto:\n{list(contatti)}", parent=root)
+    if contatto:
+        mode = int(r.hget(f'user:{contatto}', 'voted'))
+        if mode:
+            messagebox.showinfo("Errore", "Il contatto non vuole essere disturbato.")
+            return
+        chat_key = f'chat_tempo:{username}:{contatto}'
+        r.set(chat_key, 'active')
+        messagebox.showinfo("Successo", f"Chat a tempo con {contatto} avviata.")
+
 # Funzione per inviare un messaggio
 def send_message(username):
     rubrica_key = f'rubrica:{username}'
@@ -130,7 +150,7 @@ def send_message(username):
             r.hset(message_key, 'message', message)
             r.hset(message_key, 'recipient', contatto)
             r.hset(message_key, 'timestamp', datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-            messagebox.showinfo("Successo", "Message sent successfully")
+            messagebox.showinfo("Successo", "Messaggio inviato con successo")
     else:
         messagebox.showinfo("Errore", "Contatto non trovato nella rubrica.")
 
@@ -227,7 +247,7 @@ def main():
                 password = simpledialog.askstring("Accedi", "Inserisci la tua password:", parent=root)
                 if username and password and login(username, password):
                     while True:
-                        sub_scelta = simpledialog.askstring("Azioni disponibili", "1. Logout\n2. Invia Messaggio\n3. Visualizza Messaggi\n4. Gestisci Rubrica\n5. Modalità Silenziosa On/Off", parent=root)
+                        sub_scelta = simpledialog.askstring("Azioni disponibili", "1. Logout\n2. Invia Messaggio\n3. Visualizza Messaggi\n4. Gestisci Rubrica\n5. Modalità Silenziosa On/Off\n6. Chat a Tempo", parent=root)
                         if sub_scelta is None:
                             break
                         if sub_scelta == "1":
@@ -242,6 +262,8 @@ def main():
                         elif sub_scelta == "5":
                             mode = int(r.hget(f'user:{username}', 'voted'))
                             silent_mode(username, mode)
+                        elif sub_scelta == "6":
+                            avvia_chat_tempo(username)
                         else:
                             messagebox.showinfo("Errore", "Scelta non valida, riprova.")
             elif scelta == "3":
@@ -251,6 +273,7 @@ def main():
                 messagebox.showinfo("Errore", "Scelta non valida, riprova.")
         except tk.TclError:
             break
+
 
 if __name__ == '__main__':
     main()
