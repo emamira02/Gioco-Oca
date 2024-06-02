@@ -236,7 +236,7 @@ def main():
                         elif sub_scelta == "4":
                             gestisci_rubrica(username)
                         elif sub_scelta == "5":
-                            mode = int(r.hget(f'user:{username}', 'voted'))
+                            mode = str(r.hget(f'user:{username}', 'voted'))
                             silent_mode(username, mode)
                         else:
                             messagebox.showinfo("Errore", "Scelta non valida, riprova.")
