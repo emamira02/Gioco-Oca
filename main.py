@@ -14,7 +14,7 @@ def registrazione(nome_utente, password):
         return False
     user_key = f'user:{nome_utente}'
     r.hset(user_key, 'password', password)
-    r.hset(user_key, 'voted', 'False')
+    r.hset(user_key, 'voted', '0')
     r.hset('users', nome_utente, 1)
     messagebox.showinfo("Successo", "Utente registrato")
     return True
@@ -32,6 +32,21 @@ def login(username, password):
     r.set(f'user_session:{username}', 'logged_in')
     messagebox.showinfo("Successo", "Login successful")
     return True
+
+def silent_mode(username, mode):
+    #hash_persona = codice identificativo di una persona
+    #mode on: modalità silenziosa attiva;
+    #mode off: modalità silenziosa disattivata
+
+    if not mode:
+        #attiva modalità silenziosa
+        r.hset(f'user:{username}', 'voted', 1)
+        messagebox.showinfo("Do Not Disturb", f"Modalità silenziosa attivata per l'utente: {username}")
+
+    else: 
+        #disattiva modalità silenziosa 
+        r.hset(f'user:{username}', 'voted', 0)
+        messagebox.showinfo("Do Disturb", f"Modalità silenziosa disattivata per l'utente: {username}")
 
 # Funzione di logout
 def logout(username):
@@ -187,7 +202,7 @@ def main():
                 password = simpledialog.askstring("Accedi", "Inserisci la tua password:", parent=root)
                 if username and password and login(username, password):
                     while True:
-                        sub_scelta = simpledialog.askstring("Azioni disponibili", "1. Logout\n2. Invia Messaggio\n3. Visualizza Messaggi\n4. Gestisci Rubrica", parent=root)
+                        sub_scelta = simpledialog.askstring("Azioni disponibili", "1. Logout\n2. Invia Messaggio\n3. Visualizza Messaggi\n4. Gestisci Rubrica\n5. Attiva Modalità Silenziosa", parent=root)
                         if sub_scelta is None:
                             break
                         if sub_scelta == "1":
@@ -199,6 +214,9 @@ def main():
                             get_messages(username)
                         elif sub_scelta == "4":
                             gestisci_rubrica(username)
+                        elif sub_scelta == "5":
+                            mode = int(r.hget(f'user:{username}', 'voted'))
+                            silent_mode(username, mode)
                         else:
                             messagebox.showinfo("Errore", "Scelta non valida, riprova.")
             elif scelta == "3":
