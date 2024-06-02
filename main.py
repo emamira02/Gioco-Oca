@@ -114,7 +114,11 @@ def send_message(username):
     root = tk.Tk()
     root.withdraw()
     contatto = simpledialog.askstring("Invia Messaggio", f"Scegli il contatto:\n{list(contatti)}", parent=root)
-    if contatto in contatti:
+    mode = int(r.hget(f'user:{contatto}', 'voted'))
+    if mode:
+        messagebox.showinfo("Errore", "Il contatto non vuole essere disturbato.")
+        return
+    elif contatto in contatti:
         message = simpledialog.askstring("Invia Messaggio", "Inserisci il messaggio:", parent=root)
         if message:
             message_id = r.incr('message_id')

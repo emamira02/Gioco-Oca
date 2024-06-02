@@ -6,6 +6,6 @@
 6. Uscire con la x funziona solo nella prima finestra
 7. (SEMI-IMPORTANTE) I messaggi andrebbero mostrati con l'aspetto richiesto dalla traccia
 8. r.keys andrebbe sostituito con r.scan, essendo poco efficiente
-9. (IMPORTANTE) Si deve implementare il Do Not Disturb
+9. (FIXED) Si deve implementare il Do Not Disturb
 10. Nelle scelte numerate, si potrebbe mettere askinteger?
 11. Non è richiesto, quindi non è urgente, ma al momento si può riaggiungere un utente già in rubrica
