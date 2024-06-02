@@ -149,6 +149,16 @@ def send_message(username):
         messagebox.showinfo("Errore", "Contatto non trovato nella rubrica.")
 
 # Funzione per recuperare i messaggi
+def compare_messages(msg1, msg2):
+    timestamp1 = msg1[0]
+    timestamp2 = msg2[0]
+    if timestamp1 < timestamp2:
+        return -1
+    elif timestamp1 == timestamp2:
+        return 0
+    else:
+        return 1
+
 def get_messages(username):
     root = tk.Tk()
     root.withdraw()
@@ -171,13 +181,20 @@ def get_messages(username):
         recipient = message_data.get('recipient')
         if (sender == username and recipient == contatto) or (sender == contatto and recipient == username):
             timestamp = message_data.get('timestamp', 'Data non disponibile')
-            messaggi.append(f"ID: {key.split(':')[-1]}, User: {sender}, Message: {message_data['message']}, Recipient: {recipient}, Timestamp: {timestamp}")
+            message_text = message_data.get('message', 'Messaggio non disponibile')
+            messaggi.append((timestamp, sender, message_text))
+    
+    messaggi.sort(key=lambda x: x[0])  # Ordinamento per timestamp
+    messaggi_str = "\n\n".join([f"User: {msg[1]}\nMessage: {msg[2]}\nDate: {msg[0]}" for msg in messaggi])
     
     if messaggi:
-        messaggi_str = "\n\n".join(messaggi)
+        messaggi_str = "\n\n".join(
+            [f"{msg[0]}\n{msg[1]}: {msg[2]}" for msg in messaggi]
+        )
         messagebox.showinfo("Messaggi", messaggi_str)
     else:
         messagebox.showinfo("Messaggi", "Nessun messaggio trovato")
+
 
 def ricezione_messaggio(user_hash):
     # Codice per la ricezione dei messaggi in tempo reale 
