@@ -32,8 +32,24 @@ def login(username, password):
     r.set(f'user_session:{username}', 'logged_in')
     messagebox.showinfo("Successo", "Login successful")
     return True
-
 def silent_mode(username, mode):
+    if mode == 0:
+        # Attiva modalità silenziosa
+        r.hset(f'user:{username}', 'voted', 1)
+        messagebox.showinfo("Do Not Disturb", f"Modalità silenziosa attivata per l'utente: {username}")
+    else:
+        # Disattiva modalità silenziosa
+        r.hset(f'user:{username}', 'voted', 0)
+        messagebox.showinfo("Do Disturb", f"Modalità silenziosa disattivata per l'utente: {username}")
+#Funzionamento della funzione 
+# Quando mode è 0, il codice esegue r.hset(f'user:{username}', 'voted', 1), che imposta il campo voted a 1 per indicare che la modalità silenziosa è attivata.
+#Viene mostrato un messaggio con messagebox.showinfo("Do Not Disturb", f"Modalità silenziosa attivata per l'utente: {username}").
+
+#disattivazione mod: Quando mode è diverso da 0 (ad esempio, 1), il codice esegue r.hset(f'user:{username}', 'voted', 0), che imposta il campo voted a 0 per indicare che la modalità silenziosa è disattivata.
+#Viene mostrato un messaggio con messagebox.showinfo("Do Disturb", f"Modalità silenziosa disattivata per l'utente: {username}").
+        
+
+"""def silent_mode(username, mode):
     #hash_persona = codice identificativo di una persona
     #mode on: modalità silenziosa attiva;
     #mode off: modalità silenziosa disattivata
@@ -46,7 +62,8 @@ def silent_mode(username, mode):
     else: 
         #disattiva modalità silenziosa 
         r.hset(f'user:{username}', 'voted', 0)
-        messagebox.showinfo("Do Disturb", f"Modalità silenziosa disattivata per l'utente: {username}")
+        messagebox.showinfo("Do Disturb", f"Modalità silenziosa disattivata per l'utente: {username}")"""
+        
 
 # Funzione di logout
 def logout(username):
