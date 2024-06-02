@@ -65,7 +65,10 @@ def gestisci_rubrica(username):
         if scelta == "1":
 
             cerca_contatti = simpledialog.askstring("Cerca contatto", "Inserisci il nome (o una parte) del contatto da aggiungere:", parent=root)
-            cursore, contatti = r.scan(0, match=f'user:{cerca_contatti}*')
+            contatti = []
+            for utente in r.scan_iter(f"user:*"):
+                if cerca_contatti in utente:
+                    contatti.append(utente)
             if contatti:
                 contatti_dict = {str(n):nome[5:] for n, nome in enumerate(contatti, start=1)}
                 scelta = simpledialog.askstring("Aggiunta contatto", f"Scrivi il numero del contatto che vuoi aggiungere\n{contatti_dict}", parent=root)
