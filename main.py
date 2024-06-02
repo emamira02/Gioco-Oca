@@ -82,6 +82,9 @@ def visualizza_rubrica(username):
     if contatti:
         contatti_str = "\n".join(contatti)
         messagebox.showinfo("Rubrica", f"Contatti:\n{contatti_str}")
+        contatti_str = ", ".join(contatti)
+        messagebox.showinfo("Rubrica", f"Contatti: {contatti_str}")
+
     else:
         messagebox.showinfo("Rubrica", "Rubrica vuota")
 
@@ -164,7 +167,8 @@ def get_messages(username):
     root.withdraw()
     rubrica_key = f'rubrica:{username}'
     contatti = r.smembers(rubrica_key)
-    contatto = simpledialog.askstring("Visualizza Messaggi", f"Scegli il contatto:\n{list(contatti)}", parent=root)
+    contatto_str = ", ".join(contatti) 
+    contatto = simpledialog.askstring("Visualizza Messaggi", f"Scegli il contatto:\n{contatto_str}", parent=root)
     if contatto not in contatti:
         messagebox.showinfo("Errore", "Contatto non trovato nella rubrica.")
         return
