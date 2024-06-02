@@ -227,7 +227,7 @@ def main():
                 password = simpledialog.askstring("Accedi", "Inserisci la tua password:", parent=root)
                 if username and password and login(username, password):
                     while True:
-                        sub_scelta = simpledialog.askstring("Azioni disponibili", "1. Logout\n2. Invia Messaggio\n3. Visualizza Messaggi\n4. Gestisci Rubrica\n5. Attiva Modalità Silenziosa", parent=root)
+                        sub_scelta = simpledialog.askstring("Azioni disponibili", "1. Logout\n2. Invia Messaggio\n3. Visualizza Messaggi\n4. Gestisci Rubrica\n5. Modalità Silenziosa On/Off", parent=root)
                         if sub_scelta is None:
                             break
                         if sub_scelta == "1":
