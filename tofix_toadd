@@ -1,3 +1,9 @@
-1. Quando si chiede di vedere i messaggi, vengono mostrati i messaggi di tutti gli utenti
+1. (FIXED) Quando si chiede di vedere i messaggi, vengono mostrati i messaggi di tutti gli utenti
 2. I messaggi non sono in ordine cronologico
-3. Ci si può registrare con lo stesso nome utente, il che sovrascrive l'utente precedente
+3. (FIXED)Ci si può registrare con lo stesso nome utente, il che sovrascrive l'utente precedente
+4. Non si può effettuare la ricerca del parziale quando si aggiunge qualcuno
+5. Si possono aggiungere utenti non esistenti come amici
+6. Uscire con la x funziona solo nella prima finestra
+7. I messaggi andrebbero mostrati con l'aspetto richiesto dalla traccia
+8. r.keys andrebbe sostituito con r.scan, essendo poco efficiente
+9. Ancora manca il Do Not Disturb
